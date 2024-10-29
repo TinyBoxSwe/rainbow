@@ -32,61 +32,42 @@ function Stack:peek()
     return self.items[self.size]
 end
 
--- Create a namespace for highlighting
 local ns = vim.api.nvim_create_namespace("RainbowNamespace")
 
 -- Default colors for rainbow parentheses
 local default_colours = {
-    Red = { fg = "#FF5252", rank = 1 },
-    Pink = { fg = "#FF4081", rank = 2 },
-    Purple = { fg = "#7E57C2", rank = 3 },
-    DeepPurple = { fg = "#6200EA", rank = 4 },
-    Indigo = { fg = "#3F51B5", rank = 5 },
-    Blue = { fg = "#2196F3", rank = 6 },
-    LightBlue = { fg = "#03A9F4", rank = 7 },
-    Cyan = { fg = "#00BCD4", rank = 8 },
-    Teal = { fg = "#009688", rank = 9 },
-    Green = { fg = "#4CAF50", rank = 10 },
-    LightGreen = { fg = "#8BC34A", rank = 11 },
-    Lime = { fg = "#CDDC39", rank = 12 },
-    Yellow = { fg = "#FFEB3B", rank = 13 },
-    Amber = { fg = "#FFC107", rank = 14 },
-    Orange = { fg = "#FF9800", rank = 15 },
-    DeepOrange = { fg = "#FF5722", rank = 16 },
+    { name = "Red",        fg = "#FF5252", bold = true }, -- Material Red
+    { name = "Pink",       fg = "#FF4081", bold = true }, -- Material Pink
+    { name = "Purple",     fg = "#7E57C2", bold = true }, -- Material Purple
+    { name = "DeepPurple", fg = "#6200EA", bold = true }, -- Material Deep Purple
+    { name = "Indigo",     fg = "#3F51B5", bold = true }, -- Material Indigo
+    { name = "Blue",       fg = "#2196F3", bold = true }, -- Material Blue
+    { name = "LightBlue",  fg = "#03A9F4", bold = true }, -- Material Light Blue
+    { name = "Cyan",       fg = "#00BCD4", bold = true }, -- Material Cyan
+    { name = "Teal",       fg = "#009688", bold = true }, -- Material Teal
+    { name = "Green",      fg = "#4CAF50", bold = true }, -- Material Green
+    { name = "LightGreen", fg = "#8BC34A", bold = true }, -- Material Light Green
+    { name = "Lime",       fg = "#CDDC39", bold = true }, -- Material Lime
+    { name = "Yellow",     fg = "#FFEB3B", bold = true }, -- Material Yellow
+    { name = "Amber",      fg = "#FFC107", bold = true }, -- Material Amber
+    { name = "Orange",     fg = "#FF9800", bold = true }, -- Material Orange
+    { name = "DeepOrange", fg = "#FF5722", bold = true }, -- Material Deep Orange
 }
 
--- Function to set highlights for specified colors, sorted by `rank` values
-local function default_set_highlights(colour_map)
-    -- Convert the color map to a sortable list
-    local sorted_colours = {}
-    for colour_name, colour_attr in pairs(colour_map) do
-        table.insert(sorted_colours, { name = colour_name, fg = colour_attr.fg, rank = colour_attr.rank or math.huge })
-    end
-
-    -- Sort by `rank`, then by name for consistent ordering if rank is absent
-    table.sort(sorted_colours, function(a, b)
-        if a.rank == b.rank then
-            return a.name < b.name  -- Sort alphabetically if ranks are equal
-        else
-            return a.rank < b.rank
-        end
-    end)
-
-    -- Apply highlights in sorted order
-    for _, colour in ipairs(sorted_colours) do
-        vim.api.nvim_set_hl(0, colour.name, { fg = colour.fg, bold = true })
+local function set_highlights(colours)
+    for _, colour in ipairs(colours) do
+        vim.api.nvim_set_hl(0, colour.name, { fg = colour.fg, bold = colour.bold })
     end
 end
 
--- Function to apply the rainbow highlighting
 local function rainbow(colour_map)
     local buffer = vim.api.nvim_get_current_buf()
     local lines = vim.api.nvim_buf_get_lines(buffer, 0, -1, false)
     local counter = 0
-    local ps = Stack.new()
+    local ps = Stack:new()
     vim.api.nvim_buf_clear_namespace(buffer, ns, 0, -1)
 
-    local colours = vim.tbl_keys(colour_map)  -- Get the sorted list of color names
+    local colours = vim.tbl_keys(colour_map)
 
     for i, line in ipairs(lines) do
         for j = 1, #line do
@@ -94,7 +75,7 @@ local function rainbow(colour_map)
             if c == "'" or c == '"' then
                 if ps:peek() == c then
                     ps:pop()
-                else
+                elseif ps:get_size() == 0 then
                     ps:push(c)
                 end
             end
@@ -126,22 +107,18 @@ local function rainbow(colour_map)
     end
 end
 
--- Function to apply highlights and invoke rainbow logic
-local function apply_rainbow(colour_map, set_highlights)
+local function apply_rainbow(colour_map)
     set_highlights(colour_map)
     rainbow(colour_map)
 end
 
--- Setup function to configure the plugin
 function M.setup(opts)
     opts = opts or {}
     local colour_map = opts.colour_map or default_colours
-    local set_highlights = opts.set_highlights or default_set_highlights
 
-    -- Register autocommands for buffer events
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "BufReadPost", "TextChanged", "TextChangedI" }, {
         callback = function()
-            apply_rainbow(colour_map, set_highlights)
+            apply_rainbow(colour_map)
         end,
         group = vim.api.nvim_create_augroup("RainbowParentheses", { clear = true }),
     })
