@@ -91,7 +91,7 @@ local function rainbow()
                     end_col = j,
                 })
             elseif c == ')' or c == ']' or c == '}' then
-                local colour_index = counter % #colours + 1
+                local colour_index = counter % #colours
                 vim.api.nvim_buf_set_extmark(buffer, ns, i - 1, j - 1, {
                     hl_group = colours[colour_index],
                     end_line = i - 1,
