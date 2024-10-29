@@ -37,35 +37,39 @@ local ns = vim.api.nvim_create_namespace("RainbowNamespace")
 
 -- Default colors for rainbow parentheses
 local default_colours = {
-    Red = { fg = "#FF5252" },
-    Pink = { fg = "#FF4081" },
-    Purple = { fg = "#7E57C2" },
-    DeepPurple = { fg = "#6200EA" },
-    Indigo = { fg = "#3F51B5" },
-    Blue = { fg = "#2196F3" },
-    LightBlue = { fg = "#03A9F4" },
-    Cyan = { fg = "#00BCD4" },
-    Teal = { fg = "#009688" },
-    Green = { fg = "#4CAF50" },
-    LightGreen = { fg = "#8BC34A" },
-    Lime = { fg = "#CDDC39" },
-    Yellow = { fg = "#FFEB3B" },
-    Amber = { fg = "#FFC107" },
-    Orange = { fg = "#FF9800" },
-    DeepOrange = { fg = "#FF5722" },
+    Red = { fg = "#FF5252", rank = 1 },
+    Pink = { fg = "#FF4081", rank = 2 },
+    Purple = { fg = "#7E57C2", rank = 3 },
+    DeepPurple = { fg = "#6200EA", rank = 4 },
+    Indigo = { fg = "#3F51B5", rank = 5 },
+    Blue = { fg = "#2196F3", rank = 6 },
+    LightBlue = { fg = "#03A9F4", rank = 7 },
+    Cyan = { fg = "#00BCD4", rank = 8 },
+    Teal = { fg = "#009688", rank = 9 },
+    Green = { fg = "#4CAF50", rank = 10 },
+    LightGreen = { fg = "#8BC34A", rank = 11 },
+    Lime = { fg = "#CDDC39", rank = 12 },
+    Yellow = { fg = "#FFEB3B", rank = 13 },
+    Amber = { fg = "#FFC107", rank = 14 },
+    Orange = { fg = "#FF9800", rank = 15 },
+    DeepOrange = { fg = "#FF5722", rank = 16 },
 }
 
--- Function to set highlights for specified colors, sorted by `fg` values
+-- Function to set highlights for specified colors, sorted by `rank` values
 local function default_set_highlights(colour_map)
     -- Convert the color map to a sortable list
     local sorted_colours = {}
     for colour_name, colour_attr in pairs(colour_map) do
-        table.insert(sorted_colours, { name = colour_name, fg = colour_attr.fg })
+        table.insert(sorted_colours, { name = colour_name, fg = colour_attr.fg, rank = colour_attr.rank or math.huge })
     end
 
-    -- Sort by `fg` in lexicographical order
+    -- Sort by `rank`, then by name for consistent ordering if rank is absent
     table.sort(sorted_colours, function(a, b)
-        return a.fg < b.fg
+        if a.rank == b.rank then
+            return a.name < b.name  -- Sort alphabetically if ranks are equal
+        else
+            return a.rank < b.rank
+        end
     end)
 
     -- Apply highlights in sorted order
