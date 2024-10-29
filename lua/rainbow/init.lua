@@ -36,27 +36,27 @@ local ns = vim.api.nvim_create_namespace("RainbowNamespace")
 
 -- Default colors for rainbow parentheses
 local default_colours = {
-    Red = { fg = "#FF5252" },
-    Pink = { fg = "#FF4081" },
-    Purple = { fg = "#7E57C2" },
-    DeepPurple = { fg = "#6200EA" },
-    Indigo = { fg = "#3F51B5" },
-    Blue = { fg = "#2196F3" },
-    LightBlue = { fg = "#03A9F4" },
-    Cyan = { fg = "#00BCD4" },
-    Teal = { fg = "#009688" },
-    Green = { fg = "#4CAF50" },
-    LightGreen = { fg = "#8BC34A" },
-    Lime = { fg = "#CDDC39" },
-    Yellow = { fg = "#FFEB3B" },
-    Amber = { fg = "#FFC107" },
-    Orange = { fg = "#FF9800" },
-    DeepOrange = { fg = "#FF5722" },
+    { name = "Red",        fg = "#FF5252", bold = true }, -- Material Red
+    { name = "Pink",       fg = "#FF4081", bold = true }, -- Material Pink
+    { name = "Purple",     fg = "#7E57C2", bold = true }, -- Material Purple
+    { name = "DeepPurple", fg = "#6200EA", bold = true }, -- Material Deep Purple
+    { name = "Indigo",     fg = "#3F51B5", bold = true }, -- Material Indigo
+    { name = "Blue",       fg = "#2196F3", bold = true }, -- Material Blue
+    { name = "LightBlue",  fg = "#03A9F4", bold = true }, -- Material Light Blue
+    { name = "Cyan",       fg = "#00BCD4", bold = true }, -- Material Cyan
+    { name = "Teal",       fg = "#009688", bold = true }, -- Material Teal
+    { name = "Green",      fg = "#4CAF50", bold = true }, -- Material Green
+    { name = "LightGreen", fg = "#8BC34A", bold = true }, -- Material Light Green
+    { name = "Lime",       fg = "#CDDC39", bold = true }, -- Material Lime
+    { name = "Yellow",     fg = "#FFEB3B", bold = true }, -- Material Yellow
+    { name = "Amber",      fg = "#FFC107", bold = true }, -- Material Amber
+    { name = "Orange",     fg = "#FF9800", bold = true }, -- Material Orange
+    { name = "DeepOrange", fg = "#FF5722", bold = true }, -- Material Deep Orange
 }
 
-local function set_highlights(colour_map)
-    for colour_name, colour_attr in pairs(colour_map) do
-        vim.api.nvim_set_hl(0, colour_name, { fg = colour_attr.fg, bold = true })
+local function set_highlights(colours)
+    for _, colour in ipairs(colours) do
+        vim.api.nvim_set_hl(0, colour.name, { fg = colour.fg, bold = colour.bold })
     end
 end
 
